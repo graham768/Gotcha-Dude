@@ -68,7 +68,7 @@ a {
 }
 .app {
   position: relative;
-  background: #f2e9de;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;

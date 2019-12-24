@@ -139,7 +139,10 @@ class Main extends React.Component {
     const appClass = debug ? "app app--debug" : "app";
     
     return (
-      <Frame head={[<link type="text/css" rel="stylesheet" href={chrome.runtime.getURL("/static/css/content.css")} ></link>]}> 
+      <Frame head={[
+          <link type="text/css" rel="stylesheet" href={chrome.runtime.getURL("/static/css/content.css")} ></link>,
+          <link type="text/css" rel="stylesheet" href="https://unpkg.com/backpack.css" ></link>
+        ]}>
         <FrameContextConsumer>
         {
         // Callback is invoked with iframe's window and document instances
@@ -148,10 +151,10 @@ class Main extends React.Component {
             return (
               <div className={appClass} style={screenStyle}>
                 <section className="container">
-                  <h1>Hello!</h1>
+                  {/* <h1>Hello!</h1>
                   <h2>Welcome to the internet.</h2>
                   <p>This is a classic website, no traps or weird stuff!</p>
-                  <p>Feel free to browse, relax and, I don't know, click the button down there? Might as well, right?</p>
+                  <p>Feel free to browse, relax and, I don't know, click the button down there? Might as well, right?</p> */}
                   
                   <button
                     className="debug-button"
