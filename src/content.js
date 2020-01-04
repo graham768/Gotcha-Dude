@@ -9,22 +9,22 @@ import "./content.css";
 const { useState, useRef, useEffect, useLayoutEffect, createContext } = React;
 
 const CONSTANTS = {
- assetPath: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/184729",
+  assetPath: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/184729",
 }
 
 const ASSETS = {
- head: `${CONSTANTS.assetPath}/head.svg`,
- waiting: `${CONSTANTS.assetPath}/hand.svg`,
- stalking: `${CONSTANTS.assetPath}/hand-waiting.svg`,
- grabbing: `${CONSTANTS.assetPath}/hand.svg`,
- grabbed: `${CONSTANTS.assetPath}/hand-with-cursor.svg`,
- shaka: `${CONSTANTS.assetPath}/hand-surfs-up.svg`
+  head: `${CONSTANTS.assetPath}/head.svg`,
+  waiting: `${CONSTANTS.assetPath}/hand.svg`,
+  stalking: `${CONSTANTS.assetPath}/hand-waiting.svg`,
+  grabbing: `${CONSTANTS.assetPath}/hand.svg`,
+  grabbed: `${CONSTANTS.assetPath}/hand-with-cursor.svg`,
+  shaka: `${CONSTANTS.assetPath}/hand-surfs-up.svg`
 }
 
 // Preload images
 Object.keys(ASSETS).forEach(key => {
- const img = new Image();
- img.src = ASSETS[key];
+  const img = new Image();
+  img.src = ASSETS[key];
 });
 
 /**
@@ -33,62 +33,67 @@ Object.keys(ASSETS).forEach(key => {
 
 // Hover state - https://dev.to/spaciecat/hover-states-with-react-hooks-4023
 const useHover = () => {
- const ref = useRef();
- const [hovered, setHovered] = useState(false);
+  const ref = useRef();
+  const [hovered, setHovered] = useState(false);
 
- const enter = () => setHovered(true);
- const leave = () => setHovered(false);
+  const enter = () => setHovered(true);
+  const leave = () => setHovered(false);
 
- useEffect(
-  () => {
-   ref.current.addEventListener("mouseenter", enter);
-   ref.current.addEventListener("mouseleave", leave);
-   return () => {
-    ref.current.removeEventListener("mouseenter", enter);
-    ref.current.removeEventListener("mouseleave", leave);
-   };
-  },
-  [ref]
- );
+  useEffect(
+    () => {
+      ref.current.addEventListener("mouseenter", enter);
+      ref.current.addEventListener("mouseleave", leave);
+      return () => {
+        ref.current.removeEventListener("mouseenter", enter);
+        ref.current.removeEventListener("mouseleave", leave);
+      };
+    },
+    [ref]
+  );
 
- return [ref, hovered];
+  return [ref, hovered];
 };
 
 // Mouse position
+const grabZoneWrapperClass = "grab-zone-wrapper";
+const grabberIframe = "grabber-iframe";
 const useMousePosition = () => {
- const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
- useEffect(() => {
-  const setFromEvent = e => setPosition({ x: e.clientX, y: e.clientY });
-  window.addEventListener("mousemove", setFromEvent);
+  useEffect(() => {
+    const setFromEvent = e => setPosition({ x: e.clientX, y: e.clientY });
+    const iframe = document.getElementById(grabberIframe);
+    iframe.contentWindow.document.addEventListener("mousemove", setFromEvent);
+    // window.addEventListener("mousemove", setFromEvent);
 
-  return () => {
-   window.removeEventListener("mousemove", setFromEvent);
-  };
- }, []);
+    return () => {
+      iframe.contentWindow.document.removeEventListener("mousemove", setFromEvent);
+    };
+  }, []);
 
- return position;
+  return position;
 };
 
 // Element position
 const usePosition = () => {
- const ref = useRef();
- const [position, setPosition] = useState({});
+  const ref = useRef();
+  const [position, setPosition] = useState({});
 
- const handleResize = () => {
-  setPosition(ref.current.getBoundingClientRect());
- };
-
- useLayoutEffect(() => {
-  handleResize();
-  window.addEventListener('resize', handleResize);
-
-  return () => {
-   window.removeEventListener('resize', handleResize);
+  const handleResize = () => {
+    var rect = ref.current.getBoundingClientRect();
+    setPosition(rect);
   };
- }, [ref.current]);
 
- return [ref, position];
+  useLayoutEffect(() => {
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [ref.current]);
+
+  return [ref, position];
 };
 
 class Main extends React.Component {
@@ -139,7 +144,7 @@ class Main extends React.Component {
     const appClass = debug ? "app app--debug" : "app";
     
     return (
-      <Frame head={[
+      <Frame id={grabberIframe} head={[
           <link type="text/css" rel="stylesheet" href={chrome.runtime.getURL("/static/css/content.css")} ></link>,
           <link type="text/css" rel="stylesheet" href="https://unpkg.com/backpack.css" ></link>
         ]}>
@@ -171,7 +176,7 @@ class Main extends React.Component {
                     { !gameOver && !cursorGrabbed && "Button!"}
                 </button>
                 
-                <div className="grab-zone-wrapper">
+                <div className={grabZoneWrapperClass}>
                   <GrabZone
                     onCursorGrabbed={this.handleCursorGrabbed} 
                     cursorGrabbed={cursorGrabbed}
@@ -234,6 +239,7 @@ const GrabZone = ({ cursorGrabbed, gameOver, onCursorGrabbed }) => {
       <div className="grab-zone__debug">
         <strong>Debug info:</strong>
         <p>Current state: {state}</p>
+        <p>Arm Angle: {}</p>
         <p>Extended arm: {isExtended ? "Yes" : "No"}</p>
       </div>
       <div className="grab-zone__danger" ref={innerRef}>
@@ -295,16 +301,16 @@ app.style.display = "none";
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-   if( request.message === "clicked_browser_action") {
-    toggle();
-   }
+    if( request.message === "clicked_browser_action") {
+      toggle();
+    }
   }
 );
 
 function toggle(){
   if(app.style.display === "none"){
-   app.style.display = "block";
+    app.style.display = "block";
   }else{
-   app.style.display = "none";
+    app.style.display = "none";
   }
 }
