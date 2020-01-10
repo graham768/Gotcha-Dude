@@ -100,7 +100,7 @@ const usePosition = () => {
   return [ref, position];
 };
 
-class Main extends React.Component {
+class GotchaDude extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -358,16 +358,19 @@ const Grabber = ({ state, gameOver, extended, onCursorGrabbed }) => {
 
 const app = document.createElement('div');
 app.id = "my-extension-root";
-
 document.body.appendChild(app);
-ReactDOM.render(<Main />, app);
+
+ReactDOM.render(<GotchaDude />, app);
 
 app.style.display = "none";
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    if( request.message === "clicked_browser_action") {
+    if(request.message === "clicked_browser_action") {
       toggle();
+    }
+    if(request.message === "element_picker"){
+      toggleElementPicker();
     }
   }
 );
@@ -378,4 +381,8 @@ function toggle(){
   }else{
     app.style.display = "none";
   }
+}
+
+function toggleElementPicker(){
+  console.log("elementPicker toggled");
 }
